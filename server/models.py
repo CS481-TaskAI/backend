@@ -3,22 +3,22 @@ from datetime import datetime
 
 class User(db.Model):
     __tablename__ = 'user'
-    user_id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(20), unique = True)
     email = db.Column(db.String(30), unique = True)
     password = db.Column(db.String(30))
 
 class Project(db.Model):
     __tablename__ = 'project'
-    project_id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(20))
     description = db.Column(db.String(120))
 
 class Task(db.Model):
     __tablename__ = 'task'
-    task_id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.user_id))
-    project_id = db.Column(db.Integer, db.ForeignKey(Project.project_id))
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    project_id = db.Column(db.Integer, db.ForeignKey(Project.id))
     description = db.Column(db.String(120))
     date_assigned = db.Column(db.Date, default = datetime.utcnow)
     date_due = db.Column(db.Date)
@@ -29,9 +29,12 @@ class Task(db.Model):
 
 class UserProjectLink(db.Model):
     __tablename__ = 'user_project_link'
-    user_id = db.Column(db.Integer, db.ForeignKey(User.user_id), primary_key = True)
-    project_id = db.Column(db.Integer, db.ForeignKey(Project.project_id), primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id), primary_key = True)
+    project_id = db.Column(db.Integer, db.ForeignKey(Project.id), primary_key = True)
 
     #proxy objects for accessing members through foreign keys
-    user = db.relationship('User', db.ForeignKey(User.user_id))
-    project = db.relationship('Project', db.ForeignKey(Project.project_id))
+    user = db.relationship('User', db.ForeignKey(User.id))
+    project = db.relationship('Project', db.ForeignKey(Project.id))
+
+
+    
