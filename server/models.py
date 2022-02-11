@@ -17,8 +17,8 @@ class Project(db.Model):
 class Task(db.Model):
     __tablename__ = 'task'
     id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
-    project_id = db.Column(db.Integer, db.ForeignKey(Project.id))
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id)) # ForeignKey
+    project_id = db.Column(db.Integer, db.ForeignKey(Project.id)) # ForeignKey
     description = db.Column(db.String(120))
     date_assigned = db.Column(db.Date, default = datetime.utcnow)
     date_due = db.Column(db.Date)
@@ -27,14 +27,16 @@ class Task(db.Model):
     timing = db.Column(db.String(10)) #Not what type timing should be
     status = db.Column(db.Boolean, default = False) #False = not completed
 
+
 class UserProjectLink(db.Model):
     __tablename__ = 'user_project_link'
     user_id = db.Column(db.Integer, db.ForeignKey(User.id), primary_key = True)
     project_id = db.Column(db.Integer, db.ForeignKey(Project.id), primary_key = True)
 
-    #proxy objects for accessing members through foreign keys
-    user = db.relationship('User', db.ForeignKey(User.id))
-    project = db.relationship('Project', db.ForeignKey(Project.id))
+    # proxy objects for accessing members through foreign keys
+    # user = db.relationship('User', db.ForeignKey(User.id))
+    # project = db.relationship('Project', db.ForeignKey(Project.id))
+
 
 
     
