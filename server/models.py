@@ -30,8 +30,9 @@ class Task(db.Model):
 
 class UserProjectLink(db.Model):
     __tablename__ = 'user_project_link'
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id), primary_key = True)
-    project_id = db.Column(db.Integer, db.ForeignKey(Project.id), primary_key = True)
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    project_id = db.Column(db.Integer, db.ForeignKey(Project.id))
 
     # proxy objects for accessing members through foreign keys
     # user = db.relationship('User', db.ForeignKey(User.id))
