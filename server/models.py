@@ -11,7 +11,6 @@ class User(db.Model):
 class Project(db.Model):
     __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id)) # ForeignKey
     title = db.Column(db.String(20))
     description = db.Column(db.String(120))
 

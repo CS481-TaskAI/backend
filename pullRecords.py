@@ -10,7 +10,7 @@ app = create_app()
 # get all user projects given user id
 def getUserProjects(u_id):
     with app.app_context():
-        print(Project.query.filter_by(user_id=u_id).all())
+        print(UserProjectLink.query.with_entities(UserProjectLink.project_id).filter_by(user_id=u_id).all())
 
 # get all of a projects users, given project id
 # def getProjectUsers(p_id):

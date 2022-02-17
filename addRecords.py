@@ -28,7 +28,7 @@ def addProject(p_title, p_description, u_id):
         # return
     try:
         with app.app_context():
-            newProj = Project(title=p_title, description=p_description, user_id=u_id)
+            newProj = Project(title=p_title, description=p_description)
             db.session.add(newProj)
             db.session.flush() # flush so we can access the id of the new entry
             p_id = newProj.id
