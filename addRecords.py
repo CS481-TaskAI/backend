@@ -16,10 +16,12 @@ def addUser(u_username, u_email, u_password):
         # (not isinstance(u_email, str)) or (not isinstance(u_password, str))):
         # print('Bad input!')
         # return
+    
     with app.app_context():
         newUser = User(username=u_username, email=u_email, password=u_password)
         db.session.add(newUser)
         db.session.commit()
+    
 
 # u_id is used to create user project link
 def addProject(p_title, p_description, u_id):
@@ -50,7 +52,7 @@ def addTask(u_id, p_id, desc, due, priority_in, class_in, timing_in):
         except MySQLdb._exceptions.OperationalError:
             print('Bad input!')
 
-# called by addProject
+# called by addProject or when adding user to existing project
 def addUserProjectLink(u_id, p_id):
     try:
         with app.app_context():
