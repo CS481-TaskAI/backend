@@ -39,6 +39,12 @@ class Task(db.Model):
     def as_dict(self):
        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
 
+    def to_str(self):
+        dictionary = {'id':str(self.id), 'description':self.description, 'assigned':str(self.date_assigned),
+                       'due':str(self.date_due), 'priority':str(self.priority), 'classification':self.classification,
+                        'timing':self.timing, 'status':str(self.status)}
+        return json.dumps(dictionary)
+
     def __repr__(self):
         dictionary = {'id':self.id, 'description':self.description, 'assigned':str(self.date_assigned),
                        'due':str(self.date_due), 'priority':self.priority, 'classification':self.classification,
