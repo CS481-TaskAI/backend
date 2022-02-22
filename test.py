@@ -1,8 +1,8 @@
 from server.flask_app.models import *
 from server.flask_app.app import db, create_app
-from server.API.pullRecords import Get
-from server.API.addRecords import Add
-from server.API.deleteRecords import Delete
+from pullRecords import Get
+from addRecords import Add
+from deleteRecords import Delete
 
 app = create_app()
 
