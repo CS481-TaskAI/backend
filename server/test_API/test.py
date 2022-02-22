@@ -1,13 +1,10 @@
-from server.models import *
-from server import db, create_app
-
-import addRecords
-import pullRecords
-import deleteRecords
+from server.flask_app.models import *
+from server.flask_app.app import db, create_app
+from server.API import addRecords, pullRecords, deleteRecords
 
 app = create_app()
 
-# addRecords.addUser(1, 'qwer@gmail.com', 'asdf')
+addRecords.addUser(1, 'qwer@gmail.com', 'asdf')
 
 # addRecords.addProject('asdf', 'asdf', 'asdf')
 '''

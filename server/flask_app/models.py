@@ -1,4 +1,4 @@
-from . import db
+from server.flask_app.app import db
 from datetime import datetime
 import json
 
@@ -36,11 +36,15 @@ class Task(db.Model):
     timing = db.Column(db.String(10)) #Not what type timing should be
     status = db.Column(db.Boolean, default = False) #False = not completed
 
+    def toJSON(self):
+        return json.dumps(self, sort_keys=True, indent=4)
+
     def __repr__(self):
         dictionary = {'id':self.id, 'description':self.description, 'assigned':str(self.date_assigned),
                        'due':str(self.date_due), 'priority':self.priority, 'classification':self.classification,
                         'timing':self.timing, 'status':self.status}
         return json.dumps(dictionary, indent = 3)
+        
                 
 
 
