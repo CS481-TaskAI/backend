@@ -10,20 +10,14 @@ class Get():
     # get all user projects given user id
     def getUserProjects(self, u_id):
         with self.app.app_context():
-            records = db.session.query(Project).join(UserProjectLink).filter(UserProjectLink.user_id==u_id)
-            listed = records.all()
-            return listed
+            return db.session.query(Project).join(UserProjectLink).filter(UserProjectLink.user_id==u_id).all()
 
     # get all of a projects users, given project id
     def getProjectUsers(self, p_id):
         with self.app.app_context():
-            records = db.session.query(User).join(UserProjectLink).filter(UserProjectLink.user_id==p_id)
-            listed = records.all()
-            return listed    
+            return db.session.query(User).join(UserProjectLink).filter(UserProjectLink.project_id==p_id).all()
 
     # gets all tasks associated with a user
     def getUserTasks(self, u_id):
         with self.app.app_context():
-            records = db.session.query(Task).filter_by(user_id=u_id)
-            listed = records.all()
-            return listed
+            return db.session.query(Task).filter_by(user_id=u_id).all()

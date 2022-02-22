@@ -1,5 +1,5 @@
 from server.flask_app.app import db, create_app
-from pullRecords import Get
+from getRecords import Get
 from addRecords import Add
 from deleteRecords import Delete
 from flask import Flask, request, jsonify
