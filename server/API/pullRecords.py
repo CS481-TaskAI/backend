@@ -1,5 +1,4 @@
 from server.flask_app.models import *
-#from start_server import app, db
 from datetime import date
 import MySQLdb
 
