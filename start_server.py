@@ -6,7 +6,6 @@ from flask import Flask, request, jsonify
 import json
 
 app = create_app()
-db.init_app(app)
 
 get = Get(app)
 add = Add(app)
