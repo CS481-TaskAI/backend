@@ -15,7 +15,11 @@ delete = Delete(app)
 @app.route('/')
 def index():
     
-    return 'hello there'
+    resp = get.getUserTasks(1)
+    answer = ''
+    for r in resp:
+        answer += json.dumps(r.as_dict(), indent=3)
+    return answer
 
 if __name__ == '__main__':
 
