@@ -16,7 +16,7 @@ class User(db.Model):
 class Project(db.Model):
     __tablename__ = 'project'
     id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(20))
+    title = db.Column(db.String(20), unique = True)
     description = db.Column(db.String(120))
 
     def __repr__(self):

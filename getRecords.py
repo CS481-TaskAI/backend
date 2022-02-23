@@ -21,3 +21,14 @@ class Get():
     def getUserTasks(self, u_id):
         with self.app.app_context():
             return db.session.query(Task).filter_by(user_id=u_id).all()
+        
+    def getUserId(self, u_username):
+        with self.app.app_context():
+            user = db.session.query(User).filter_by(username=u_username).first()
+            return user.id
+        
+    def getProjectId(self, p_title):
+        with self.app.app_context():
+            project = db.session.query(Project).filter_by(title=p_title).first()
+            return project.id
+    

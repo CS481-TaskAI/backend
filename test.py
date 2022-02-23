@@ -37,6 +37,9 @@ add.addTask(2, 2, 'asdf', '2022-02-20', 1, 'asdf', 'asdf')
 
 # modify.modifyTask(1, 'qwer', 2022-2-22, 3, 'qewr', 'asdf')
 
-modify.markTaskCompleted(1)
+# modify.markTaskCompleted(1)
+
+p_id = get.getProjectId('proj1')
+print(p_id)
 
 

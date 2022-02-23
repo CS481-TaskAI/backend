@@ -41,5 +41,3 @@ class Modify():
             task = db.session.query(Task).filter_by(id=t_id).first()
             task.status = True
             db.session.commit()
-            
-    # test above two and commit
