@@ -21,6 +21,15 @@ class Get():
     def getUserTasks(self, u_id):
         with self.app.app_context():
             return db.session.query(Task).filter_by(user_id=u_id).all()
+    
+    # returns an int list containing all the contacts of a user
+    def getContacts(self, u_id):
+        with self.app.app_context():
+            contacts = db.session.query(Contact).filter_by(user_id=u_id).all()
+            friends = []
+            for contact in contacts:
+                friends.append(contact.friend_id)
+            return friends
         
     def getUserId(self, u_username):
         with self.app.app_context():

@@ -12,6 +12,7 @@ class User(db.Model):
     def __repr__(self):
         dictionary = {'id':self.id, 'username':self.username, 'email':self.email}
         return json.dumps(dictionary, indent = 3)
+    
 
 class Project(db.Model):
     __tablename__ = 'project'
@@ -22,6 +23,7 @@ class Project(db.Model):
     def __repr__(self):
         dictionary = {'id':self.id, 'title':self.title, 'description':self.description}
         return json.dumps(dictionary, indent = 3)
+    
 
 class Task(db.Model):
     __tablename__ = 'task'
@@ -51,9 +53,7 @@ class Task(db.Model):
                         'timing':self.timing, 'status':self.status}
         return json.dumps(dictionary, indent = 3)
         
-                
-
-
+    
 class UserProjectLink(db.Model):
     __tablename__ = 'user_project_link'
     id = db.Column(db.Integer, primary_key = True)
@@ -63,7 +63,11 @@ class UserProjectLink(db.Model):
     # proxy objects for accessing members through foreign keys
     # user = db.relationship('User', db.ForeignKey(User.id))
     # project = db.relationship('Project', db.ForeignKey(Project.id))
-
-
+    
+class Contact(db.Model):
+    __tablename__ = 'contact'
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    friend_id = db.Column(db.Integer, db.ForeignKey(User.id))
 
     

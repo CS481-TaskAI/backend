@@ -14,6 +14,10 @@ class Delete():
             projectLinks = db.session.query(UserProjectLink).filter_by(user_id=u_id).all() # later make all
             for link in projectLinks:
                 db.session.delete(link)
+            # deleting this user's contacts
+            contacts = db.session.query(Contact).filter_by(user_id=u_id).all() # later make all
+            for contact in contacts:
+                db.session.delete(contact)
             # deleting this user's tasks
             tasks = db.session.query(Task).filter_by(user_id=u_id).all() # later make all
             for task in tasks:
@@ -52,3 +56,12 @@ class Delete():
             userProjectLink = db.session.query(UserProjectLink).filter_by(project_id=p_id, user_id=u_id).first()
             db.session.delete(userProjectLink)
             db.session.commit()
+            
+    # delete individual contact
+    def deleteContact(self, u_id, f_id):
+        with self.app.app_context():
+            contact = db.session.query(Contact).filter_by(user_id=u_id, friend_id=f_id).first()
+            db.session.delete(contact)
+            db.session.commit()
+            
+    

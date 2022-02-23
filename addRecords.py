@@ -63,3 +63,9 @@ class Add():
                 db.session.commit()
         except MySQLdb._exceptions.OperationalError:
             print('Bad input!')
+            
+    def addContact(self, u_id, f_id):
+        with self.app.app_context():
+                newContact = Contact(user_id=u_id, friend_id=f_id)
+                db.session.add(newContact)
+                db.session.commit()

@@ -28,7 +28,7 @@ add.addProject('proj3', 'do stuff 3', 1)
 
 add.addTask(2, 2, 'asdf', '2022-02-20', 1, 'asdf', 'asdf')
 '''
-# delete.deleteProject(2)
+# delete.deleteUser(1)
 
 # projects = get.getUserProjects(1)
 # print(projects)
@@ -39,7 +39,12 @@ add.addTask(2, 2, 'asdf', '2022-02-20', 1, 'asdf', 'asdf')
 
 # modify.markTaskCompleted(1)
 
-p_id = get.getProjectId('proj1')
-print(p_id)
+# p_id = get.getProjectId('proj1')
+# print(p_id)
 
+# add.addContact(3, 4)
+# add.addUser('asdf3', 'asdf3', 'asdf3')
+# add.addContact(3, 5)
+# delete.deleteContact(3, 4)
+print(get.getContacts(3))
 
