@@ -33,11 +33,16 @@ class Get():
         
     def getUserId(self, u_username):
         with self.app.app_context():
-            user = db.session.query(User).filter_by(username=u_username).first()
-            return user.id
+            try:
+                user = db.session.query(User).filter_by(username=u_username).first()
+                return user.id
+            except AttributeError: # user = None
+                return 0
         
     def getProjectId(self, p_title):
         with self.app.app_context():
-            project = db.session.query(Project).filter_by(title=p_title).first()
-            return project.id
-    
+            try:
+                project = db.session.query(Project).filter_by(title=p_title).first()
+                return project.id
+            except AttributeError: # project = None
+                return 0
