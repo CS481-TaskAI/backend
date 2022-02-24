@@ -31,6 +31,10 @@ class Get():
                 friends.append(contact.friend_id)
             return friends
         
+    def getUser(self, u_username, u_password):
+        with self.app.app_context():
+            return db.session.query(User).filter_by(username=u_username,password=u_password).first()
+        
     def getUserId(self, u_username):
         with self.app.app_context():
             try:

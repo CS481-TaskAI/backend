@@ -39,7 +39,7 @@ def tasks():
         # then,
         # add users with these parameters
 
-    obs = get.getUserTasks(1)
+    obs = get.getUserTasks(2)
     list_of_dicts = to_list_dict(obs)
     return jsonify(list_of_dicts)
 

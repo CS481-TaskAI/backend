@@ -46,5 +46,6 @@ add.addTask(2, 2, 'asdf', '2022-02-20', 1, 'asdf', 'asdf')
 # add.addUser('asdf3', 'asdf3', 'asdf3')
 # add.addContact(3, 5)
 # delete.deleteContact(3, 4)
-print(get.getContacts(3))
+print(get.getUserId('asdf1234'))
+# add.addTask(2, 2, 'asdf', '2022-02-20', 1, 'asdf', 'asdf')
 
