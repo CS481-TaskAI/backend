@@ -2,14 +2,17 @@ from server.flask_app.app import db, create_app
 from getRecords import Get
 from addRecords import Add
 from deleteRecords import Delete
+from modifyRecords import Modify
 from flask import Flask, request, jsonify
 import json
 
 app = create_app()
 
+#-----------------API Accesser Initialization-------------------------------------
 get = Get(app)
 add = Add(app)
 delete = Delete(app)
+modify = Modify(app)
 
 #--------------------Get and Post routes------------------------------------------
 
@@ -18,11 +21,40 @@ delete = Delete(app)
 # Post will attempt to create database records if email or username don't exist
 @app.route('/user', methods = ['GET', 'POST'])
 def login_signup():
-    #here we will pass take the id from the request and pull 
-    #the records using the id
+    
+    #SIGN UP
+    if request.method == 'POST':    
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
+        if get.getUserId(username) != 0:
+            #return error code, username taken
+            pass
+        elif get.getUserIdByEmail(email) != 0:
+            #return error code, email taken
+            pass
+        
+        #if validEmail(email) and validUsername(username):
+        #add.addUser(username, email, password)      
 
-    # add.addUser(...)      -> if ok return record, if not None
-    pass
+    #LOG IN
+    username = request.form["username"]
+    email = request.form["email"]
+    password = request.form["password"]
+    if  get.getUserId(username) == 0:
+        #return error code , no such username
+        pass
+    elif get.getUserIdByEmail(email) == 0:
+        #return error code , no such email
+        pass
+    #at this point username is valid, need to validate password
+    usr = get.getUser(username, password)
+    if usr == 0:
+        #return error code, wrong password
+        pass 
+    usr_dict = to_list_dict(usr)
+    return jsonify(usr_dict)
+    
 
 #checkCreds (username , password) -> if match return the record, if not None
 
@@ -45,12 +77,13 @@ def tasks():
         due = request.form["date_due"]
         classification = request.form["classification"]
         timing = request.form["timing"]
-        add.addTask(u_id, p_id, desc, due, classification, timing)
-
+        if not add.addTask(u_id, p_id, desc, due, classification, timing):
+            #return an error code 
+            pass
     u_id = request.form["user_id"]
     obs = get.getUserTasks(u_id)
-    list_of_dicts = to_list_dict(obs)
-    return jsonify(list_of_dicts)
+    dict_of_tasks = to_list_dict(obs)
+    return jsonify(dict_of_tasks)
 
 #Returns all contacts given user_id
 #creates contact given contact username
