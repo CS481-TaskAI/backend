@@ -33,13 +33,24 @@ class Get():
         
     def getUser(self, u_username, u_password):
         with self.app.app_context():
-            return db.session.query(User).filter_by(username=u_username,password=u_password).first()
+            usr = db.session.query(User).filter_by(username=u_username).first()
+            if usr.password != u_password:
+                return 0
+            return usr
         
     def getUserId(self, u_username):
         with self.app.app_context():
             try:
                 user = db.session.query(User).filter_by(username=u_username).first()
                 return user.id
+            except AttributeError: # user = None
+                return 0
+    
+    def getUserIdByEmail(self, u_email):
+        with self.app.app_context():
+            try:
+                user = db.session.query(User).filter_by(email=u_email).first()
+                return user.email
             except AttributeError: # user = None
                 return 0
         
