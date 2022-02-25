@@ -67,6 +67,8 @@ class Add():
             try:
                 newContact = Contact(user_id=u_id, friend_id=f_id)
                 db.session.add(newContact)
+                newContactReverse = Contact(user_id=f_id, friend_id=u_id)
+                db.session.add(newContactReverse)
                 db.session.commit()
                 return True
             except:

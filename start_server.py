@@ -122,6 +122,19 @@ def to_list_dict(obs):
         my_list.append(rec.as_dict())
     return my_list
 
+def isValidEmail(email):
+    if (len(email) < 3):
+        return False
+    num = email.count("@")
+    if (num != 1):
+        return False
+    if (email[0] == '@' or email[len(email) - 1] == '@'):
+        return False
+    return True
+
+def isValidPW(password):
+    return (len(password) >= 8 and len(password) <= 30)
+
 if __name__ == '__main__':
 
     app.run(debug=True)

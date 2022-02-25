@@ -10,17 +10,29 @@ class Get():
     # get all user projects given user id
     def getUserProjects(self, u_id):
         with self.app.app_context():
-            return db.session.query(Project).join(UserProjectLink).filter(UserProjectLink.user_id==u_id).all()
+            userProjects = db.session.query(Project).join(UserProjectLink).filter(UserProjectLink.user_id==u_id).all()
+            if not userProjects:
+                return 0
+            else:
+                return userProjects
 
     # get all of a projects users, given project id
     def getProjectUsers(self, p_id):
         with self.app.app_context():
-            return db.session.query(User).join(UserProjectLink).filter(UserProjectLink.project_id==p_id).all()
+            projectUsers = db.session.query(User).join(UserProjectLink).filter(UserProjectLink.project_id==p_id).all()
+            if not projectUsers:
+                return 0
+            else:
+                return projectUsers
 
     # gets all tasks associated with a user
     def getUserTasks(self, u_id):
         with self.app.app_context():
-            return db.session.query(Task).filter_by(user_id=u_id).all()
+            userTasks = db.session.query(Task).filter_by(user_id=u_id).all()
+            if not userTasks:
+                return 0
+            else:
+                return userTasks
     
     # returns an int list containing all the contacts of a user
     def getContacts(self, u_id):
@@ -29,7 +41,10 @@ class Get():
             friends = []
             for contact in contacts:
                 friends.append(contact.friend_id)
-            return friends
+            if not friends:
+                return 0
+            else:
+                return friends
         
     def getUser(self, u_username, u_password):
         with self.app.app_context():

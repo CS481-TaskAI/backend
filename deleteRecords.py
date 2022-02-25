@@ -81,6 +81,8 @@ class Delete():
             try:
                 contact = db.session.query(Contact).filter_by(user_id=u_id, friend_id=f_id).first()
                 db.session.delete(contact)
+                contactReverse = db.session.query(Contact).filter_by(user_id=f_id, friend_id=u_id).first()
+                db.session.delete(contactReverse)
                 db.session.commit()
                 return True
             except:
