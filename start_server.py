@@ -20,7 +20,12 @@ delete = Delete(app)
 def login_signup():
     #here we will pass take the id from the request and pull 
     #the records using the id
+
+    # add.addUser(...)      -> if ok return record, if not None
     pass
+
+#checkCreds (username , password) -> if match return the record, if not None
+
 
 # Returns all projects given a user_id
 # Creates project if all parameters valid, returns projects
@@ -35,11 +40,15 @@ def tasks():
     
     if request.method == 'POST':
         u_id = request.form["user_id"]
-        # rest of the attributes
-        # then,
-        # add users with these parameters
+        p_id = request.form["project_id"]
+        desc = request.form["description"]
+        due = request.form["date_due"]
+        classification = request.form["classification"]
+        timing = request.form["timing"]
+        add.addTask(u_id, p_id, desc, due, classification, timing)
 
-    obs = get.getUserTasks(1)
+    u_id = request.form["user_id"]
+    obs = get.getUserTasks(u_id)
     list_of_dicts = to_list_dict(obs)
     return jsonify(list_of_dicts)
 
@@ -62,6 +71,7 @@ def update_projects():
 @app.route('/mod_tasks', methods = ['PUT', 'DELETE'])
 def update_tasks():
     # if either, afterwards reroute to GET /tasks
+    #re
     pass
 
 #Modify or delete Contacts, reroutes to associated Get route
