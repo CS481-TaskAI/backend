@@ -9,6 +9,9 @@ class User(db.Model):
     email = db.Column(db.String(30), unique = True)
     password = db.Column(db.String(30))
 
+    def as_dict(self):
+       return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+
     def __repr__(self):
         dictionary = {'id':self.id, 'username':self.username, 'email':self.email}
         return json.dumps(dictionary, indent = 3)
@@ -19,6 +22,9 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(20), unique = True)
     description = db.Column(db.String(120))
+
+    def as_dict(self):
+       return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
 
     def __repr__(self):
         dictionary = {'id':self.id, 'title':self.title, 'description':self.description}
@@ -40,12 +46,6 @@ class Task(db.Model):
 
     def as_dict(self):
        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
-
-    def to_str(self):
-        dictionary = {'id':str(self.id), 'description':self.description, 'assigned':str(self.date_assigned),
-                       'due':str(self.date_due), 'priority':str(self.priority), 'classification':self.classification,
-                        'timing':self.timing, 'status':str(self.status)}
-        return json.dumps(dictionary)
 
     def __repr__(self):
         dictionary = {'id':self.id, 'description':self.description, 'assigned':str(self.date_assigned),
