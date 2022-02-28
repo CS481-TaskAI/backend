@@ -3,7 +3,7 @@ from getRecords import Get
 from addRecords import Add
 from deleteRecords import Delete
 from modifyRecords import Modify
-from flask import Flask, request, jsonify
+from flask import Flask, request, redirect, url_for, jsonify
 import json
 
 app = create_app()
@@ -28,48 +28,65 @@ def login_signup():
         email = request.form["email"]
         password = request.form["password"]
         if get.getUserId(username) != 0:
-            #return error code, username taken
-            pass
+            return jsonify({"error": "Username already taken."})
         elif get.getUserIdByEmail(email) != 0:
-            #return error code, email taken
-            pass
+            return jsonify({"error": "There already exists an account with this email address."})
+
+        if not isValidEmail(email):
+            return jsonify({"error": "Enter a valid email address."})
+        if not isValidUsername(username):
+            return jsonify({"error": "Username should be 20 characters or less"})
+        if not isValidPW(password):
+            return jsonify({"error": "Password should be at least 8 characters and no more than 30 characters"})
         
-        #if validEmail(email) and validUsername(username):
-        #add.addUser(username, email, password)      
+        if not add.addUser(username, email, password):
+            return jsonify({"error": "Oops. Something went wrong..."})   
 
     #LOG IN
     username = request.form["username"]
-    email = request.form["email"]
+    #email = request.form["email"]
     password = request.form["password"]
     if  get.getUserId(username) == 0:
-        #return error code , no such username
-        pass
-    elif get.getUserIdByEmail(email) == 0:
-        #return error code , no such email
-        pass
+        return jsonify({"error": "Username does not exist."})
+
+    # TODO: enable logining in by email instead of username
+    #elif get.getUserIdByEmail(email) == 0:
+        #return jsonify({"error": "Username or Email are incorrect"})
+        
     #at this point username is valid, need to validate password
     usr = get.getUser(username, password)
     if usr == 0:
-        #return error code, wrong password
+        return jsonify({"error": "Incorrect password."})
         pass 
     usr_dict = to_list_dict(usr)
     return jsonify(usr_dict)
     
-
-#checkCreds (username , password) -> if match return the record, if not None
-
-
 # Returns all projects given a user_id
 # Creates project if all parameters valid, returns projects
 @app.route('/projects', methods = ['GET', 'POST'])
 def projects():
-    pass
+    
+    #CREATE PROJECT
+    if request.method == 'POST':
+        u_id = request.form["user_id"]
+        title = request.form["title"]
+        desc = request.form["description"]
+        if not add.addProject(title, desc, u_id):
+            return jsonify({"error": "Could not create Project."})
+    
+    #GET ALL USER PROJECTS
+    u_id = request.form["user_id"]
+    projects = get.getUserProjects(u_id)
+    dict_of_projects = to_list_dict(projects)
+    return jsonify(dict_of_projects)
+
 
 #Returns all tasks given a user_id
 #Creates task if all parameters valid, returns tasks
 @app.route('/tasks', methods = ['GET', 'POST'])
 def tasks():
     
+    #CREATE TASK
     if request.method == 'POST':
         u_id = request.form["user_id"]
         p_id = request.form["project_id"]
@@ -78,8 +95,9 @@ def tasks():
         classification = request.form["classification"]
         timing = request.form["timing"]
         if not add.addTask(u_id, p_id, desc, due, classification, timing):
-            #return an error code 
-            pass
+            return jsonify({"error": "Could not add task."}) 
+    
+    #GET ALL USER TASKS
     u_id = request.form["user_id"]
     obs = get.getUserTasks(u_id)
     dict_of_tasks = to_list_dict(obs)
@@ -87,30 +105,67 @@ def tasks():
 
 #Returns all contacts given user_id
 #creates contact given contact username
-@app.route("/contact", methods = ['GET', 'POST'])
+@app.route("/contacts", methods = ['GET', 'POST'])
 def contacts():
-    # if either, after reroute to GET /c
-    pass
+
+    #CREATE CONTACT
+    if request.method == 'POST':
+        u_id = request.form["user_id"]
+        c_username = request.form["contact_username"]
+        c_id = get.getUserId(c_username)
+        if c_id == 0:
+            return jsonify({"error": "No such user by that username."})
+        if not add.addContact(u_id, c_id):
+            return jsonify({"error": "Could not add contact."})
+
+    #GET ALL CONTACTS
+    u_id = request.form["user_id"]
+    contacts = get.getContacts(u_id)
+    dict_of_contacts = to_list_dict(contacts)
+    return jsonify(dict_of_contacts)
 
 #--------------------Update and Delete routes---------------------------------------
 
 #Modify or delete Projects, reroutes to associated Get route
 @app.route('/mod_projects', methods = ['PUT', 'DELETE'])
 def update_projects():
-    # if either, afterwards reroute to GET /projects
-    pass
+    
+    #DELETE PROJECT
+    if request.method == 'DELETE':
+        p_id = request.form["project_id"]
+        if not delete.deleteProject(p_id):
+            return jsonify({"error": "Could not delete project."})
+        return redirect(url_for('/projects'))
+
+    #MODIFY PROJECT
+    if request.method == 'PUT':
+        p_id = request.form["project_id"]
+        title = request.form["title"]
+        desc = request.form["description"]
+        if not modify.modifyProject(p_id, title, desc):
+            return jsonify({"error": "Could not modify project."})
+        return redirect(url_for('/projects'))
+
 
 #Modify or delete Tasks, reroutes to associated Get route
 @app.route('/mod_tasks', methods = ['PUT', 'DELETE'])
 def update_tasks():
     # if either, afterwards reroute to GET /tasks
     #re
-    pass
+    return redirect(url_for('/tasks'))
 
 #Modify or delete Contacts, reroutes to associated Get route
-@app.route("/mod_contact", methods = ['PUT', 'DELETE'])
+@app.route("/mod_contacts", methods = ['DELETE'])
 def update_contacts():
-    pass
+    
+    #DELETE CONTACT
+    u_id = request.form["user_id"]
+    c_id = request.form["contact_id"]
+    if not delete.deleteContact(u_id, c_id):
+        return jsonify({"error": "Could not delete contact."})
+
+    return redirect(url_for('/contacts'))
+    
 
 
 #-------------------Utility--------------------------------------------------
@@ -134,6 +189,9 @@ def isValidEmail(email):
 
 def isValidPW(password):
     return (len(password) >= 8 and len(password) <= 30)
+
+def isValidUsername(username):
+    return (len(username) < 21 and len(username) > 0)
 
 if __name__ == '__main__':
 

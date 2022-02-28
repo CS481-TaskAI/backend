@@ -25,6 +25,9 @@ class Get():
             else:
                 return projectUsers
 
+    # get all tasks of a project.
+    #def getProjectTasks(self, p_id):
+
     # gets all tasks associated with a user
     def getUserTasks(self, u_id):
         with self.app.app_context():
