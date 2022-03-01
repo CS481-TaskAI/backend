@@ -22,9 +22,9 @@ class Delete():
                 for contact in contacts:
                     db.session.delete(contact)
                 # deleting this user's tasks
-                tasks = db.session.query(Task).filter_by(user_id=u_id).all() # later make all
-                for task in tasks:
-                    db.session.delete(task)
+                # tasks = db.session.query(Task).filter_by(user_id=u_id).all() # later make all
+                # for task in tasks:
+                    # db.session.delete(task)
                 # now deleting the actual project
                 user = db.session.query(User).filter_by(id=u_id).first()
                 db.session.delete(user)
@@ -37,12 +37,12 @@ class Delete():
     def deleteProject(self, p_id):
         with self.app.app_context():
             try:
-                # first deleting the links to this project
-                projectLinks = db.session.query(UserProjectLink).filter_by(project_id=p_id).all() # later make all
+                # first deleting the user links to this project
+                projectLinks = db.session.query(UserProjectLink).filter_by(project_id=p_id).all()
                 for link in projectLinks:
                     db.session.delete(link)
                 # deleting this project's tasks
-                tasks = db.session.query(Task).filter_by(project_id=p_id).all() # later make all
+                tasks = db.session.query(Task).filter_by(project_id=p_id).all()
                 for task in tasks:
                     db.session.delete(task)
                 # now deleting the actual project
@@ -57,6 +57,11 @@ class Delete():
     def deleteTask(self, t_id):
         with self.app.app_context():
             try:
+                # first deleting the links to this task
+                taskLinks = db.session.query(UserTaskLink).filter_by(task_id=t_id).all()
+                for link in projectLinks:
+                    db.session.delete(link)
+                # now deleting the actual task
                 task = db.session.query(Task).filter_by(id=t_id).first()
                 db.session.delete(task)
                 db.session.commit()

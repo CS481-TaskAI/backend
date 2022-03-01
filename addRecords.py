@@ -42,11 +42,14 @@ class Add():
     def addTask(self, u_id, p_id, desc, due, priority_in, class_in, timing_in):
         with self.app.app_context():
             try:
-                newTask = Task(user_id=u_id, project_id=p_id, description=desc, 
+                newTask = Task(project_id=p_id, description=desc, 
                         date_due=due, priority=priority_in, classification=class_in,
                         timing=timing_in)
                 db.session.add(newTask)
+                db.session.flush() # flush so we can access the id of the new entry
+                p_id = newTask.id
                 db.session.commit()
+                self.addUserTaskLink(u_id, t_id) # create user-project link with user and newly created project
                 return True
             except:
                 return False
@@ -56,6 +59,17 @@ class Add():
         with self.app.app_context():
             try:
                 newLink = UserProjectLink(user_id=u_id, project_id=p_id)
+                db.session.add(newLink)
+                db.session.commit()
+                return True
+            except:
+                return False
+            
+    # called by addTask or when adding user to existing task
+    def addUserTaskLink(self, u_id, t_id):
+        with self.app.app_context():
+            try:
+                newLink = UserTaskLink(user_id=u_id, task_id=t_id)
                 db.session.add(newLink)
                 db.session.commit()
                 return True

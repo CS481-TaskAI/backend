@@ -34,7 +34,7 @@ class Project(db.Model):
 class Task(db.Model):
     __tablename__ = 'task'
     id = db.Column(db.Integer, primary_key = True)
-    user_id = db.Column(db.Integer, db.ForeignKey(User.id)) # ForeignKey
+    # user_id = db.Column(db.Integer, db.ForeignKey(User.id)) # ForeignKey
     project_id = db.Column(db.Integer, db.ForeignKey(Project.id)) # ForeignKey
     description = db.Column(db.String(120))
     date_assigned = db.Column(db.Date, default = datetime.utcnow)
@@ -63,6 +63,12 @@ class UserProjectLink(db.Model):
     # proxy objects for accessing members through foreign keys
     # user = db.relationship('User', db.ForeignKey(User.id))
     # project = db.relationship('Project', db.ForeignKey(Project.id))
+    
+class UserTaskLink(db.Model):
+    __tablename__ = 'user_task_link'
+    id = db.Column(db.Integer, primary_key = True)
+    user_id = db.Column(db.Integer, db.ForeignKey(User.id))
+    task_id = db.Column(db.Integer, db.ForeignKey(Task.id))
     
 class Contact(db.Model):
     __tablename__ = 'contact'

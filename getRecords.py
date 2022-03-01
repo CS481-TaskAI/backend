@@ -17,21 +17,36 @@ class Get():
                 return userProjects
 
     # get all of a projects users, given project id
-    def getProjectUsers(self, p_id):
+    def getProjectTeam(self, p_id):
         with self.app.app_context():
-            projectUsers = db.session.query(User).join(UserProjectLink).filter(UserProjectLink.project_id==p_id).all()
-            if not projectUsers:
+            team = db.session.query(User).join(UserProjectLink).filter(UserProjectLink.project_id==p_id).all()
+            if not team:
                 return 0
             else:
-                return projectUsers
+                return team
+            
+    # get all of a tasks users, given task id
+    def getTaskTeam(self, t_id):
+        with self.app.app_context():
+            team = db.session.query(User).join(UserTaskLink).filter(UserTaskLink.task_id==t_id).all()
+            if not team:
+                return 0
+            else:
+                return team
 
     # get all tasks of a project.
-    #def getProjectTasks(self, p_id):
-
+    def getProjectTasks(self, p_id):
+        with self.app.app_context():
+            tasks = db.session.query(Task).filter_by(project_id=p_id).all()
+            if not tasks:
+                return 0
+            else:
+                return tasks
+        
     # gets all tasks associated with a user
     def getUserTasks(self, u_id):
         with self.app.app_context():
-            userTasks = db.session.query(Task).filter_by(user_id=u_id).all()
+            userTasks = db.session.query(Task).join(UserTaskLink).filter(UserTaskLink.user_id==u_id).all()
             if not userTasks:
                 return 0
             else:
