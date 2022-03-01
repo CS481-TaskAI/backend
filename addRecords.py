@@ -47,7 +47,7 @@ class Add():
                         timing=timing_in)
                 db.session.add(newTask)
                 db.session.flush() # flush so we can access the id of the new entry
-                p_id = newTask.id
+                t_id = newTask.id
                 db.session.commit()
                 self.addUserTaskLink(u_id, t_id) # create user-project link with user and newly created project
                 return True

@@ -59,7 +59,7 @@ class Delete():
             try:
                 # first deleting the links to this task
                 taskLinks = db.session.query(UserTaskLink).filter_by(task_id=t_id).all()
-                for link in projectLinks:
+                for link in taskLinks:
                     db.session.delete(link)
                 # now deleting the actual task
                 task = db.session.query(Task).filter_by(id=t_id).first()
