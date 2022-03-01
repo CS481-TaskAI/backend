@@ -51,10 +51,25 @@ class Get():
         
     def getUser(self, u_username, u_password):
         with self.app.app_context():
-            usr = db.session.query(User).filter_by(username=u_username).first()
-            if usr.password != u_password:
+            try:
+                usr = db.session.query(User).filter_by(username=u_username).first()
+                if usr.password != u_password:
+                    return 0
+                return usr
+            except AttributeError: # user = None
                 return 0
-            return usr
+            
+      
+    # for login
+    def getUserByEmail(self, u_email, u_password):
+        with self.app.app_context():
+            try:
+                usr = db.session.query(User).filter_by(email=u_email).first()
+                if usr.password != u_password:
+                    return 0
+                return usr
+            except AttributeError: # user = None
+                return 0
         
     def getUserId(self, u_username):
         with self.app.app_context():
