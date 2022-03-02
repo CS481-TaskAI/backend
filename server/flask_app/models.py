@@ -40,8 +40,8 @@ class Task(db.Model):
     date_assigned = db.Column(db.Date, default = datetime.utcnow)
     date_due = db.Column(db.Date)
     priority = db.Column(db.Integer)
-    classification = db.Column(db.String(10))
-    timing = db.Column(db.String(10)) #Not what type timing should be
+    classification = db.Column(db.String(20))
+    timing = db.Column(db.String(20)) #Not what type timing should be
     status = db.Column(db.Boolean, default = False) #False = not completed
 
     def as_dict(self):
