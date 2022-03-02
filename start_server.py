@@ -16,17 +16,31 @@ modify = Modify(app)
 
 #--------------------Get and Post routes------------------------------------------
 
+#TODO: /add_user_to_task
+#      /add_user_to_project
+#      /remove_user_from_task
+#      /remove_user_from_project
+#      finish /modify_tasks
+
+
 # Will take the username and password and authenticate
 # Returns user id
 # Post will attempt to create database records if email or username don't exist
 @app.route('/user', methods = ['GET', 'POST'])
 def login_signup():
+
+    if request.is_json:
+        # Parse the JSON into a Python dictionary
+        req = request.get_json()
+    else:
+        # The request body wasn't JSON so return a 400 HTTP status code
+        return "Request was not JSON", 400
     
     #SIGN UP
     if request.method == 'POST':    
-        username = request.form["username"]
-        email = request.form["email"]
-        password = request.form["password"]
+        username = req["username"]
+        email = req["email"]
+        password = req["password"]
         if get.getUserId(username) != 0:
             return jsonify({"error": "Username already taken."})
         elif get.getUserIdByEmail(email) != 0:
@@ -43,15 +57,15 @@ def login_signup():
             return jsonify({"error": "Oops. Something went wrong..."})   
 
     #LOG IN
-    username = request.form["username"]
-    #email = request.form["email"]
-    password = request.form["password"]
-    if  get.getUserId(username) == 0:
-        return jsonify({"error": "Username does not exist."})
+    #username = req["username"]
+    email = request.form["email"]
+    password = req["password"]
+    #if  get.getUserId(username) == 0:
+    #    return jsonify({"error": "Username does not exist."})
 
     # TODO: enable logining in by email instead of username
-    #elif get.getUserIdByEmail(email) == 0:
-        #return jsonify({"error": "Username or Email are incorrect"})
+    if get.getUserIdByEmail(email) == 0:
+        return jsonify({"error": "Username or Email are incorrect"})
         
     #at this point username is valid, need to validate password
     usr = get.getUser(username, password)
@@ -60,47 +74,79 @@ def login_signup():
         pass 
     usr_dict = to_list_dict(usr)
     return jsonify(usr_dict)
-    
+
+
 # Returns all projects given a user_id
 # Creates project if all parameters valid, returns projects
 @app.route('/projects', methods = ['GET', 'POST'])
 def projects():
     
+    if request.is_json:
+        # Parse the JSON into a Python dictionary
+        req = request.get_json()
+    else:
+        # The request body wasn't JSON so return a 400 HTTP status code
+        return "Request was not JSON", 400
+   
+
     #CREATE PROJECT
     if request.method == 'POST':
-        u_id = request.form["user_id"]
-        title = request.form["title"]
-        desc = request.form["description"]
+        u_id = req["user_id"]
+        title = req["title"]
+        desc = req["description"]
+        print('posting a project to db\t')
         if not add.addProject(title, desc, u_id):
             return jsonify({"error": "Could not create Project."})
     
+    print("after ")
     #GET ALL USER PROJECTS
-    u_id = request.form["user_id"]
+    u_id = req['user_id']
     projects = get.getUserProjects(u_id)
+    if projects == 0:
+        return {}
     dict_of_projects = to_list_dict(projects)
-    return jsonify(dict_of_projects)
+    print(dict_of_projects)
+    return jsonify(dict_of_projects), 200
+
+
 
 
 #Returns all tasks given a user_id
 #Creates task if all parameters valid, returns tasks
 @app.route('/tasks', methods = ['GET', 'POST'])
 def tasks():
+
+    if request.is_json:
+        # Parse the JSON into a Python dictionary
+        req = request.get_json()
+    else:
+        # The request body wasn't JSON so return a 400 HTTP status code
+        return "Request was not JSON", 400
     
     #CREATE TASK
     if request.method == 'POST':
-        u_id = request.form["user_id"]
-        p_id = request.form["project_id"]
-        desc = request.form["description"]
-        due = request.form["date_due"]
-        classification = request.form["classification"]
-        timing = request.form["timing"]
-        if not add.addTask(u_id, p_id, desc, due, classification, timing):
+        u_id = req["user_id"]
+        p_id = req["project_id"]
+        desc = req["description"]
+        due = req["date_due"]
+        classification = req["classification"]
+        timing = req["timing"]
+        try:
+            priority = req["priority"]
+        except KeyError:
+            priority = 3
+
+        # call to Machine Learning module
+        # returns priority, reassigns priority to new one
+        if not add.addTask(u_id, p_id, desc, due, priority, classification, timing):
             return jsonify({"error": "Could not add task."}) 
     
     #GET ALL USER TASKS
-    u_id = request.form["user_id"]
-    obs = get.getUserTasks(u_id)
-    dict_of_tasks = to_list_dict(obs)
+    u_id = req["user_id"]
+    tasks = get.getUserTasks(u_id)
+    if tasks == 0:
+        return {}
+    dict_of_tasks = to_list_dict(tasks)
     return jsonify(dict_of_tasks)
 
 #Returns all contacts given user_id
@@ -108,10 +154,17 @@ def tasks():
 @app.route("/contacts", methods = ['GET', 'POST'])
 def contacts():
 
+    if request.is_json:
+        # Parse the JSON into a Python dictionary
+        req = request.get_json()
+    else:
+        # The request body wasn't JSON so return a 400 HTTP status code
+        return "Request was not JSON", 400
+
     #CREATE CONTACT
     if request.method == 'POST':
-        u_id = request.form["user_id"]
-        c_username = request.form["contact_username"]
+        u_id = req["user_id"]
+        c_username = req["contact_username"]
         c_id = get.getUserId(c_username)
         if c_id == 0:
             return jsonify({"error": "No such user by that username."})
@@ -119,7 +172,7 @@ def contacts():
             return jsonify({"error": "Could not add contact."})
 
     #GET ALL CONTACTS
-    u_id = request.form["user_id"]
+    u_id = req["user_id"]
     contacts = get.getContacts(u_id)
     dict_of_contacts = to_list_dict(contacts)
     return jsonify(dict_of_contacts)
@@ -129,42 +182,64 @@ def contacts():
 #Modify or delete Projects, reroutes to associated Get route
 @app.route('/mod_projects', methods = ['PUT', 'DELETE'])
 def update_projects():
+
+    if request.is_json:
+        # Parse the JSON into a Python dictionary
+        req = request.get_json()
+    else:
+        # The request body wasn't JSON so return a 400 HTTP status code
+        return "Request was not JSON", 400
     
     #DELETE PROJECT
     if request.method == 'DELETE':
-        p_id = request.form["project_id"]
+        p_id = req["project_id"]
         if not delete.deleteProject(p_id):
             return jsonify({"error": "Could not delete project."})
-        return redirect(url_for('/projects'))
+        return {}
 
     #MODIFY PROJECT
     if request.method == 'PUT':
-        p_id = request.form["project_id"]
-        title = request.form["title"]
-        desc = request.form["description"]
+        p_id = req["project_id"]
+        title = req["title"]
+        desc = req["description"]
         if not modify.modifyProject(p_id, title, desc):
             return jsonify({"error": "Could not modify project."})
-        return redirect(url_for('/projects'))
+        return {}
 
 
 #Modify or delete Tasks, reroutes to associated Get route
 @app.route('/mod_tasks', methods = ['PUT', 'DELETE'])
 def update_tasks():
+
+    if request.is_json:
+        # Parse the JSON into a Python dictionary
+        req = request.get_json()
+    else:
+        # The request body wasn't JSON so return a 400 HTTP status code
+        return "Request was not JSON", 400
+
     # if either, afterwards reroute to GET /tasks
     #re
-    return redirect(url_for('/tasks'))
+    return {}
 
 #Modify or delete Contacts, reroutes to associated Get route
 @app.route("/mod_contacts", methods = ['DELETE'])
 def update_contacts():
+
+    if request.is_json:
+        # Parse the JSON into a Python dictionary
+        req = request.get_json()
+    else:
+        # The request body wasn't JSON so return a 400 HTTP status code
+        return "Request was not JSON", 400
     
     #DELETE CONTACT
-    u_id = request.form["user_id"]
-    c_id = request.form["contact_id"]
+    u_id = req["user_id"]
+    c_id = req["contact_id"]
     if not delete.deleteContact(u_id, c_id):
         return jsonify({"error": "Could not delete contact."})
 
-    return redirect(url_for('/contacts'))
+    return {}
     
 
 
