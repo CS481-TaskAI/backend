@@ -10,11 +10,13 @@ class Modify():
     # return value of all functions below is true if success, false if failure
 
     # updates information of the user with the given id, to the given parameters
-    def modifyUser(self, u_id, u_username, u_email, u_password, u_bio):
+    def modifyUser(self, u_id, u_username, u_firstname, u_lastname, u_email, u_password, u_bio):
         with self.app.app_context():
             try:
                 user = db.session.query(User).filter_by(id=u_id).first()
                 user.username = u_username
+                user.firstname = u_firstname
+                user.lastname = u_lastname
                 user.email = u_email
                 user.password = u_password
                 user.bio = u_bio

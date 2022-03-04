@@ -16,9 +16,9 @@ modify = Modify(app)
 
 # addRecords.addProject('asdf', 'asdf', 'asdf')
 #'''
-add.addUser('asdf1', 'asdf1@asdf1', 'asdf1', 'bio1')
+add.addUser('asdf1', 'first1', 'last1', 'asdf1@asdf1', 'asdf1', 'bio1')
 
-add.addUser('asdf2', 'asdf2', 'asdf2', 'bio2')
+add.addUser('asdf2', 'first1', 'last1', 'asdf2@asdf', 'asdf2', 'bio2')
 
 add.addProject('proj1', 'do stuff 1', 1)
 

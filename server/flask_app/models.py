@@ -6,6 +6,8 @@ class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key = True)
     username = db.Column(db.String(20), unique = True)
+    firstname = db.Column(db.String(20))
+    lastname = db.Column(db.String(20))
     email = db.Column(db.String(30), unique = True)
     password = db.Column(db.String(30))
     bio = db.Column(db.String(280))
