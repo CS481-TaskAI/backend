@@ -6,6 +6,18 @@ class Get():
 
     def __init__(self, app):
         self.app = app
+        
+    # returns boolean for if two users are contacts
+    def isContact(self, u_id, f_id):
+        with self.app.app_context():
+            contacts = db.session.query(Contact).filter_by(user_id=u_id,friend_id=f_id).all()
+            if contacts:
+                return True
+            else:
+                return False
+    
+    def isValidBio(bio):
+        return (len(bio) < 281 and len(bio) > 0)
 
     # get all user projects given user id
     def getUserProjects(self, u_id):

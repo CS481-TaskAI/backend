@@ -8,6 +8,7 @@ class User(db.Model):
     username = db.Column(db.String(20), unique = True)
     email = db.Column(db.String(30), unique = True)
     password = db.Column(db.String(30))
+    bio = db.Column(db.String(280))
 
     def as_dict(self):
        return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}

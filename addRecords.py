@@ -13,10 +13,10 @@ class Add():
     # return value of all functions below is true if success, false if failure
 
     # db auto assigns and increments id, no need to explicitly assign id
-    def addUser(self, u_username, u_email, u_password):
+    def addUser(self, u_username, u_email, u_password, u_bio):
         with self.app.app_context():
             try:
-                newUser = User(username=u_username, email=u_email, password=u_password)
+                newUser = User(username=u_username, email=u_email, password=u_password, bio=u_bio)
                 db.session.add(newUser)
                 db.session.commit()
                 return True

@@ -21,10 +21,10 @@ class Delete():
                 contacts = db.session.query(Contact).filter_by(user_id=u_id).all() # later make all
                 for contact in contacts:
                     db.session.delete(contact)
-                # deleting this user's tasks
-                # tasks = db.session.query(Task).filter_by(user_id=u_id).all() # later make all
-                # for task in tasks:
-                    # db.session.delete(task)
+                # deleting this user's tasks links
+                taskLinks = db.session.query(UserTaskLink).filter_by(user_id=u_id).all() # later make all
+                for link in taskLinks:
+                    db.session.delete(link)
                 # now deleting the actual project
                 user = db.session.query(User).filter_by(id=u_id).first()
                 db.session.delete(user)
