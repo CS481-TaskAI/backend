@@ -1,4 +1,5 @@
 from server.flask_app.app import db, create_app
+from server.flask_app.models import *
 from getRecords import Get
 from addRecords import Add
 from deleteRecords import Delete
@@ -16,79 +17,95 @@ modify = Modify(app)
 
 #--------------------Get and Post routes------------------------------------------
 
+@app.route('/t', methods = ['GET'])
+def t():
+    print(type(get.getUserTasks(1)))
+    return ""
+
 #TODO: /add_user_to_task
 #      /add_user_to_project
 #      /remove_user_from_task
 #      /remove_user_from_project
 #      finish /modify_tasks
 
-
 # Will take the username and password and authenticate
 # Returns user id
 # Post will attempt to create database records if email or username don't exist
-@app.route('/user', methods = ['GET', 'POST'])
-def login_signup():
+@app.route('/login', methods = ['POST'])
+def login():
 
-    if request.is_json:
-        # Parse the JSON into a Python dictionary
-        req = request.get_json()
-    else:
+    if request.method != 'POST': 
+        return "/login accepts POST method only.", 400
+    if not request.is_json:
         # The request body wasn't JSON so return a 400 HTTP status code
         return "Request was not JSON", 400
     
     #SIGN UP
-    if request.method == 'POST':    
-        username = req["username"]
-        email = req["email"]
-        password = req["password"]
-        if get.getUserId(username) != 0:
-            return jsonify({"error": "Username already taken."})
-        elif get.getUserIdByEmail(email) != 0:
-            return jsonify({"error": "There already exists an account with this email address."})
-
-        if not isValidEmail(email):
-            return jsonify({"error": "Enter a valid email address."})
-        if not isValidUsername(username):
-            return jsonify({"error": "Username should be 20 characters or less"})
-        if not isValidPW(password):
-            return jsonify({"error": "Password should be at least 8 characters and no more than 30 characters"})
-        
-        if not add.addUser(username, email, password):
-            return jsonify({"error": "Oops. Something went wrong..."})   
-
-    #LOG IN
+    req = request.get_json()
+   
     #username = req["username"]
-    email = request.form["email"]
+    email = req["email"]
     password = req["password"]
-    #if  get.getUserId(username) == 0:
-    #    return jsonify({"error": "Username does not exist."})
-
-    # TODO: enable logining in by email instead of username
+    
     if get.getUserIdByEmail(email) == 0:
-        return jsonify({"error": "Username or Email are incorrect"})
+        return jsonify({"error": "Email is incorrect"})
         
     #at this point username is valid, need to validate password
-    usr = get.getUser(username, password)
+    usr = get.getUserByEmail(email, password)
     if usr == 0:
         return jsonify({"error": "Incorrect password."})
-        pass 
-    usr_dict = to_list_dict(usr)
-    return jsonify(usr_dict)
+    
+    usr_dict = usr.as_dict()
+    usr_clean = {"username": usr_dict["username"], "id": usr_dict["id"], "email": usr_dict["email"],
+                "firstname": usr_dict["firstname"], "lastname": usr_dict["lastname"], "bio": usr_dict["bio"]}
+    return jsonify(usr_clean)
 
 
+# Will take the username and password and authenticate
+# Returns user id
+# Post will attempt to create database records if email or username don't exist
+@app.route('/signup', methods = ['POST'])
+def signup():
+
+    if request.method != 'POST': 
+        return "/signup accepts POST method only.", 400
+    if not request.is_json:
+        return "Request was not JSON", 400
+    
+    #SIGN UP
+    req = request.get_json()
+    
+    firstname = req["firstname"]
+    lastname = req["lastname"]
+    bio = req["bio"]
+    username = req["username"]
+    email = req["email"]
+    password = req["password"]
+    if get.getUserId(username) != 0:
+        return jsonify({"error": "Username already taken."})
+    elif get.getUserIdByEmail(email) != 0:
+        return jsonify({"error": "There already exists an account with this email address."})
+    if not isValidEmail(email):
+        return jsonify({"error": "Enter a valid email address."})
+    if not isValidUsername(username):
+        return jsonify({"error": "Username should be 20 characters or less"})
+    if not isValidPW(password):
+        return jsonify({"error": "Password should be at least 8 characters and no more than 30 characters"})
+    
+    if not add.addUser(username, firstname, lastname, email, password, bio):
+        return jsonify({"error": "Oops. Something went wrong..."})   
+    return {}
+                        
 # Returns all projects given a user_id
 # Creates project if all parameters valid, returns projects
 @app.route('/projects', methods = ['GET', 'POST'])
 def projects():
     
-    if request.is_json:
-        # Parse the JSON into a Python dictionary
-        req = request.get_json()
-    else:
-        # The request body wasn't JSON so return a 400 HTTP status code
+    if not request.is_json:
         return "Request was not JSON", 400
+    
+    req = request.get_json()
    
-
     #CREATE PROJECT
     if request.method == 'POST':
         u_id = req["user_id"]
@@ -97,8 +114,9 @@ def projects():
         print('posting a project to db\t')
         if not add.addProject(title, desc, u_id):
             return jsonify({"error": "Could not create Project."})
+        return {}
     
-    print("after ")
+    
     #GET ALL USER PROJECTS
     u_id = req['user_id']
     projects = get.getUserProjects(u_id)
@@ -108,29 +126,28 @@ def projects():
     print(dict_of_projects)
     return jsonify(dict_of_projects), 200
 
-
-
-
 #Returns all tasks given a user_id
 #Creates task if all parameters valid, returns tasks
 @app.route('/tasks', methods = ['GET', 'POST'])
 def tasks():
-
-    if request.is_json:
-        # Parse the JSON into a Python dictionary
-        req = request.get_json()
-    else:
-        # The request body wasn't JSON so return a 400 HTTP status code
-        return "Request was not JSON", 400
     
     #CREATE TASK
     if request.method == 'POST':
+
+        if not request.is_json:
+            return "Request was not JSON", 400
+    
+        req = request.get_json()
+
         u_id = req["user_id"]
         p_id = req["project_id"]
         desc = req["description"]
         due = req["date_due"]
         classification = req["classification"]
         timing = req["timing"]
+        #date_assigned = now -> handled by db
+        #status = false
+        #difficulty?
         try:
             priority = req["priority"]
         except KeyError:
@@ -141,28 +158,46 @@ def tasks():
         if not add.addTask(u_id, p_id, desc, due, priority, classification, timing):
             return jsonify({"error": "Could not add task."}) 
     
-    #GET ALL USER TASKS
-    u_id = req["user_id"]
-    tasks = get.getUserTasks(u_id)
-    if tasks == 0:
+    
+    u_id = request.args.get('user_id')
+    p_id = request.args.get('project_id')
+
+    print(f"PRINT USER {u_id} TASKS")
+
+    my_tasks = get.getUserTasks(u_id)
+    #NO TASKS FOR THIS USER
+    if my_tasks == 0:
         return {}
-    dict_of_tasks = to_list_dict(tasks)
-    return jsonify(dict_of_tasks)
+    #IF NO p_id PROVIDED, LIST ALL TASKS
+    elif p_id is None:
+        dict_of_tasks = to_list_dict(my_tasks)
+        return jsonify(dict_of_tasks)
+    
+    all_p_tasks = get.getProjectTasks(p_id)
+    combined = common(my_tasks, all_p_tasks)
+    
+    if len(combined) > 0:
+        dict_of_tasks = to_list_dict(combined)
+        return jsonify(dict_of_tasks)
+    #NO TASKS IN THIS PROJECT
+    else:
+        return {}
+
+ 
 
 #Returns all contacts given user_id
 #creates contact given contact username
 @app.route("/contacts", methods = ['GET', 'POST'])
 def contacts():
 
-    if request.is_json:
-        # Parse the JSON into a Python dictionary
-        req = request.get_json()
-    else:
-        # The request body wasn't JSON so return a 400 HTTP status code
-        return "Request was not JSON", 400
-
     #CREATE CONTACT
     if request.method == 'POST':
+
+        if not request.is_json:
+            return "Request was not JSON", 400
+    
+        req = request.get_json()
+
         u_id = req["user_id"]
         c_username = req["contact_username"]
         c_id = get.getUserId(c_username)
@@ -170,12 +205,18 @@ def contacts():
             return jsonify({"error": "No such user by that username."})
         if not add.addContact(u_id, c_id):
             return jsonify({"error": "Could not add contact."})
+        return {}
 
     #GET ALL CONTACTS
-    u_id = req["user_id"]
-    contacts = get.getContacts(u_id)
-    dict_of_contacts = to_list_dict(contacts)
-    return jsonify(dict_of_contacts)
+    u_id = request.args.get('user_id')
+    contact_ids = get.getContacts(u_id)
+    if len(contact_ids) == 0:
+        return {}
+    else:
+        contacts = []
+        for con in contact_ids:
+            contacts.append(get.getSafeContact(con))
+        return jsonify(contacts)
 
 #--------------------Update and Delete routes---------------------------------------
 
@@ -267,6 +308,21 @@ def isValidPW(password):
 
 def isValidUsername(username):
     return (len(username) < 21 and len(username) > 0)
+
+def common(lst1, lst2): 
+    return list(set(lst1) & set(lst2))
+
+# returns boolean for if two users are contacts
+def isContact(self, u_id, f_id):
+    with self.app.app_context():
+        contacts = db.session.query(Contact).filter_by(user_id=u_id,friend_id=f_id).all()
+        if contacts:
+            return True
+        else:
+            return False
+
+def isValidBio(bio):
+    return (len(bio) < 281 and len(bio) > 0)
 
 if __name__ == '__main__':
 
