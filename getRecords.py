@@ -6,18 +6,6 @@ class Get():
 
     def __init__(self, app):
         self.app = app
-        
-    # returns boolean for if two users are contacts
-    def isContact(self, u_id, f_id):
-        with self.app.app_context():
-            contacts = db.session.query(Contact).filter_by(user_id=u_id,friend_id=f_id).all()
-            if contacts:
-                return True
-            else:
-                return False
-    
-    def isValidBio(bio):
-        return (len(bio) < 281 and len(bio) > 0)
 
     # get all user projects given user id
     def getUserProjects(self, u_id):
@@ -75,6 +63,19 @@ class Get():
                 return 0
             else:
                 return friends
+
+    # returns contacts information given their id 
+    def getSafeContact(self, c_id):
+        with self.app.app_context():
+            try:
+                contact = db.session.query(User).filter_by(user_id=c_id).first()
+                c = contact.as_dict()
+                return {"username": c["username"], "id": c["id"], "email": c["email"],
+                        "firstname": c["firstname"], "lastname": c["lastname"], "bio": c["bio"]}
+            except AttributeError: # user = None
+                return 0
+
+            
         
     def getUser(self, u_username, u_password):
         with self.app.app_context():
