@@ -70,8 +70,7 @@ class Get():
             try:
                 contact = db.session.query(User).filter_by(user_id=c_id).first()
                 c = contact.as_dict()
-                return {"username": c["username"], "id": c["id"], "email": c["email"],
-                        "firstname": c["firstname"], "lastname": c["lastname"], "bio": c["bio"]}
+                return {"username": c["username"], "id": c["id"], "email": c["email"], "bio": c["bio"]}
             except AttributeError: # user = None
                 return 0
 

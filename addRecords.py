@@ -13,11 +13,10 @@ class Add():
     # return value of all functions below is true if success, false if failure
 
     # db auto assigns and increments id, no need to explicitly assign id
-    def addUser(self, u_username, u_firstname, u_lastname, u_email, u_password, u_bio):
+    def addUser(self, u_username, u_email, u_password, u_bio):
         with self.app.app_context():
             try:
-                newUser = User(username=u_username, firstname=u_firstname, lastname=u_lastname, 
-                               email=u_email, password=u_password, bio=u_bio)
+                newUser = User(username=u_username, email=u_email, password=u_password, bio=u_bio)
                 db.session.add(newUser)
                 db.session.commit()
                 return True
@@ -84,6 +83,16 @@ class Add():
                 db.session.add(newContact)
                 newContactReverse = Contact(user_id=f_id, friend_id=u_id)
                 db.session.add(newContactReverse)
+                db.session.commit()
+                return True
+            except:
+                return False
+
+    def addUserToProject(self, u_id, p_id):
+        with self.app.app_context():
+            try:
+                newParticipant = UserProjectLink(user_id=u_id, project_id=p_id)
+                db.session.add(newParticipant)
                 db.session.commit()
                 return True
             except:

@@ -17,11 +17,6 @@ modify = Modify(app)
 
 #--------------------Get and Post routes------------------------------------------
 
-@app.route('/t', methods = ['GET'])
-def t():
-    print(type(get.getUserTasks(1)))
-    return ""
-
 #TODO: /add_user_to_task
 #      /add_user_to_project
 #      /remove_user_from_task
@@ -56,8 +51,7 @@ def login():
         return jsonify({"error": "Incorrect password."})
     
     usr_dict = usr.as_dict()
-    usr_clean = {"username": usr_dict["username"], "id": usr_dict["id"], "email": usr_dict["email"],
-                "firstname": usr_dict["firstname"], "lastname": usr_dict["lastname"], "bio": usr_dict["bio"]}
+    usr_clean = {"username": usr_dict["username"], "id": usr_dict["id"], "email": usr_dict["email"], "bio": usr_dict["bio"]}
     return jsonify(usr_clean)
 
 
@@ -74,9 +68,7 @@ def signup():
     
     #SIGN UP
     req = request.get_json()
-    
-    firstname = req["firstname"]
-    lastname = req["lastname"]
+
     bio = req["bio"]
     username = req["username"]
     email = req["email"]
@@ -92,7 +84,7 @@ def signup():
     if not isValidPW(password):
         return jsonify({"error": "Password should be at least 8 characters and no more than 30 characters"})
     
-    if not add.addUser(username, firstname, lastname, email, password, bio):
+    if not add.addUser(username, email, password, bio):
         return jsonify({"error": "Oops. Something went wrong..."})   
     return {}
                         
@@ -101,13 +93,15 @@ def signup():
 @app.route('/projects', methods = ['GET', 'POST'])
 def projects():
     
-    if not request.is_json:
-        return "Request was not JSON", 400
     
-    req = request.get_json()
    
     #CREATE PROJECT
     if request.method == 'POST':
+
+        if not request.is_json:
+            return "Request was not JSON", 400
+        req = request.get_json()
+
         u_id = req["user_id"]
         title = req["title"]
         desc = req["description"]
@@ -118,7 +112,7 @@ def projects():
     
     
     #GET ALL USER PROJECTS
-    u_id = req['user_id']
+    u_id = request.args.get('user_id')
     projects = get.getUserProjects(u_id)
     if projects == 0:
         return {}
@@ -159,26 +153,31 @@ def tasks():
             return jsonify({"error": "Could not add task."}) 
     
     
+    my_args = request.args.to_dict()
+    print(my_args)
+    
     u_id = request.args.get('user_id')
     p_id = request.args.get('project_id')
 
-    print(f"PRINT USER {u_id} TASKS")
-
+    
+    print(f"\nUSER id : {u_id}\nPROJECT id: {p_id} ")
     my_tasks = get.getUserTasks(u_id)
     #NO TASKS FOR THIS USER
     if my_tasks == 0:
         return {}
-    #IF NO p_id PROVIDED, LIST ALL TASKS
-    elif p_id is None:
+    #IF NO p_id PROVIDED, LIST ALL USER TASKS
+    if p_id is None:
         dict_of_tasks = to_list_dict(my_tasks)
         return jsonify(dict_of_tasks)
     
     all_p_tasks = get.getProjectTasks(p_id)
-    combined = common(my_tasks, all_p_tasks)
-    
+    if all_p_tasks == 0:
+        return {}
+
+    combined = common(to_list_dict(my_tasks), to_list_dict(all_p_tasks))
+    print(combined)
     if len(combined) > 0:
-        dict_of_tasks = to_list_dict(combined)
-        return jsonify(dict_of_tasks)
+        return jsonify(combined)
     #NO TASKS IN THIS PROJECT
     else:
         return {}
@@ -217,6 +216,11 @@ def contacts():
         for con in contact_ids:
             contacts.append(get.getSafeContact(con))
         return jsonify(contacts)
+
+#/add_user_to_project
+@app.route("/add_user_to_project", methods = ['POST'])
+def joinProject():
+    pass
 
 #--------------------Update and Delete routes---------------------------------------
 
@@ -310,7 +314,24 @@ def isValidUsername(username):
     return (len(username) < 21 and len(username) > 0)
 
 def common(lst1, lst2): 
-    return list(set(lst1) & set(lst2))
+
+    print("in common\n")
+    print(lst1)
+    print(lst2)
+
+    t_ids = []
+    for ob in lst1:
+        t_ids.append(ob["id"])
+    
+    print(t_ids)
+    final = []
+    for ob in lst2:
+        if ob["id"] in t_ids:
+            final.append(ob)
+    return final
+
+# def common(lst1, lst2):
+#     return list( set(lst1).intersection(set(lst2)) ) 
 
 # returns boolean for if two users are contacts
 def isContact(self, u_id, f_id):
