@@ -39,12 +39,12 @@ class Add():
                 return False
 
     #   Need to know user id and project id before adding task
-    def addTask(self, u_id, p_id, desc, due, priority_in, class_in, timing_in):
+    def addTask(self, u_id, p_id, desc, due, priority_in, class_in, diff):
         with self.app.app_context():
             try:
                 newTask = Task(project_id=p_id, description=desc, 
                         date_due=due, priority=priority_in, classification=class_in,
-                        timing=timing_in)
+                        difficulty=diff)
                 db.session.add(newTask)
                 db.session.flush() # flush so we can access the id of the new entry
                 t_id = newTask.id

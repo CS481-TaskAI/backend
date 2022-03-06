@@ -42,7 +42,7 @@ class Task(db.Model):
     date_due = db.Column(db.Date)
     priority = db.Column(db.Integer)
     classification = db.Column(db.String(20))
-    timing = db.Column(db.String(20)) #Not what type timing should be
+    difficulty = db.Column(db.String(20))
     status = db.Column(db.Boolean, default = False) #False = not completed
 
     def as_dict(self):

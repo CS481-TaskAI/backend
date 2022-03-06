@@ -68,7 +68,7 @@ class Get():
     def getSafeContact(self, c_id):
         with self.app.app_context():
             try:
-                contact = db.session.query(User).filter_by(user_id=c_id).first()
+                contact = db.session.query(User).filter_by(id=c_id).first()
                 c = contact.as_dict()
                 return {"username": c["username"], "id": c["id"], "email": c["email"], "bio": c["bio"]}
             except AttributeError: # user = None
