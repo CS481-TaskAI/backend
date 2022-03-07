@@ -16,7 +16,18 @@ add = Add(app)
 delete = Delete(app)
 modify = Modify(app)
 
-print(getRecPriority(date.today(), date(2022, 3, 17), 1, 3))
+# "YYYY-MM-DD" to date object
+def strToDate(str):
+    tokens = str.split('-')
+    nums = list()
+    for token in tokens:
+        nums.append(int(token))
+    return date(nums[0], nums[1], nums[2])
+ 
+#print(strToDate('2022-03-17')) 
+
+print(getRecPriority(date.today(), strToDate('2022-03-17'), 1, 3))
+#print(getRecPriority(date.today(), , 1, 3))
 
 # addRecords.addUser(1, 'qwer@gmail.com', 'asdf')
 

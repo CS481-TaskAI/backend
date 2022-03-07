@@ -138,7 +138,7 @@ def tasks():
         u_id = req["user_id"]
         p_id = req["project_id"]
         desc = req["description"]
-        due = req["date_due"]
+        due = req["date_due"] # string "YYYY-MM-DD"
         classification = req["classification"]
         diff = req["difficulty"]
         # date_assigned = datetime.utcnow
@@ -151,8 +151,8 @@ def tasks():
         #    priority = 3
 
         # call to Machine Learning module, returns priority
-        # takes date object for due, int for classification and diff
-        priority = getRecPriority(date.today(), due, classification, diff) 
+        # string for due, int for classification and diff
+        priority = getRecPriority(date.today(), strToDate(due), classification, diff) 
         
         if not add.addTask(u_id, p_id, desc, due, priority, classification, diff):
             return jsonify({"error": "Could not add task."}) 
@@ -349,6 +349,14 @@ def isContact(self, u_id, f_id):
 
 def isValidBio(bio):
     return (len(bio) < 281 and len(bio) > 0)
+
+# "YYYY-MM-DD" to date object
+def strToDate(str):
+    tokens = str.split('-')
+    nums = list()
+    for token in tokens:
+        nums.append(int(token))
+    return date(nums[0], nums[1], nums[2])
 
 if __name__ == '__main__':
 
