@@ -4,8 +4,9 @@ from getRecords import Get
 from addRecords import Add
 from deleteRecords import Delete
 from modifyRecords import Modify
+from priorityAssignment import getRecPriority
 from flask import Flask, request, redirect, url_for, jsonify
-from datetime import datetime
+from datetime import datetime, date
 import json
 
 app = create_app()
@@ -140,20 +141,19 @@ def tasks():
         due = req["date_due"]
         classification = req["classification"]
         diff = req["difficulty"]
-        date_assigned = datetime.utcnow
+        # date_assigned = datetime.utcnow
         #status = false    handled by db
 
         
-        try:
-            priority = req["priority"]
-        except KeyError:
-            priority = 3
+        #try:
+        #    priority = req["priority"]
+        #except KeyError:
+        #    priority = 3
 
-        # call to Machine Learning module
-        # returns priority
-        #
-        #priority = NAME_OF_ML_FUNCTION(assigned, due, classification, diff)
-        #
+        # call to Machine Learning module, returns priority
+        # takes date object for due, int for classification and diff
+        priority = getRecPriority(date.today(), due, classification, diff) 
+        
         if not add.addTask(u_id, p_id, desc, due, priority, classification, diff):
             return jsonify({"error": "Could not add task."}) 
     

@@ -10,7 +10,7 @@ import math
 from datetime import datetime
 
 # Import in database csv from path
-sampleData = pd.read_csv("C://Users//appel//Documents//CodingProjects//Capstone//Testing//final_sample_data.csv")
+sampleData = pd.read_csv("final_sample_data.csv")
 
 # Array for showing the column types of sampleData
 distance_columns = ['class', 'difficulty', 'days_remaining', 'priority']
