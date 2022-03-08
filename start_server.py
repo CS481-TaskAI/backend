@@ -239,15 +239,13 @@ def joinProject():
 @app.route('/mod_projects', methods = ['PUT', 'DELETE'])
 def update_projects():
 
-    if request.is_json:
-        # Parse the JSON into a Python dictionary
-        req = request.get_json()
-    else:
-        # The request body wasn't JSON so return a 400 HTTP status code
-        return "Request was not JSON", 400
+    
     
     #DELETE PROJECT
     if request.method == 'DELETE':
+        if not request.is_json:
+            return "Request was not JSON", 400
+        req = request.get_json()
         p_id = req["project_id"]
         if not delete.deleteProject(p_id):
             return jsonify({"error": "Could not delete project."})
@@ -267,27 +265,39 @@ def update_projects():
 @app.route('/mod_tasks', methods = ['PUT', 'DELETE'])
 def update_tasks():
 
-    if request.is_json:
-        # Parse the JSON into a Python dictionary
-        req = request.get_json()
-    else:
-        # The request body wasn't JSON so return a 400 HTTP status code
+    if not request.is_json:
         return "Request was not JSON", 400
+    req = request.get_json()
 
-    # if either, afterwards reroute to GET /tasks
-    #re
+    #DELETE TASK
+    if request.method == 'DELETE':
+        t_id = req["task_id"]
+
+        if not delete.deleteTask(t_id):
+            return jsonify({"error": "Could not delete task"})
+        return {}
+
+    #PUT
+    t_id = req["task_id"]
+    if not modify.markTaskCompleted(t_id):
+        return jsonify({"error": "Could not update task"})
     return {}
 
 #Modify or delete Contacts, reroutes to associated Get route
 @app.route("/mod_contacts", methods = ['DELETE'])
 def update_contacts():
 
-    if request.is_json:
-        # Parse the JSON into a Python dictionary
+    if request.method == 'DELETE':
+
+        if not request.is_json:
+            return "Request was not JSON", 400
         req = request.get_json()
-    else:
-        # The request body wasn't JSON so return a 400 HTTP status code
-        return "Request was not JSON", 400
+        u_id = req["user_id"]
+        c_id = req["contact_id"]
+
+        if not delete.deleteContact(u_id, c_id):
+            return jsonify({"error": "Could not delete contact"})
+        return {}
     
     #DELETE CONTACT
     u_id = req["user_id"]
