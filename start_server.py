@@ -140,11 +140,16 @@ def tasks():
         desc = req["description"]
         due = req["date_due"] # string "YYYY-MM-DD"
         classification = req["classification"]
+        classification = classification.lower()
         diff = req["difficulty"]
-        # date_assigned = datetime.utcnow
         #status = false    handled by db
 
-        
+        #classification ([0, 1, 2] = [communication, process, logistics]), 
+        # difficulty ([0, 1, 2, 3]=[Easy, Medium, Hard, Extreme])
+
+        classifier = class_int[classification]
+        difficult = diff_int[diff]
+
         #try:
         #    priority = req["priority"]
         #except KeyError:
@@ -152,10 +157,11 @@ def tasks():
 
         # call to Machine Learning module, returns priority
         # string for due, int for classification and diff
-        priority = getRecPriority(date.today(), strToDate(due), classification, diff) 
+        priority = getRecPriority(date.today(), strToDate(due), classifier, difficult) 
         
         if not add.addTask(u_id, p_id, desc, due, priority, classification, diff):
             return jsonify({"error": "Could not add task."}) 
+        return {}
     
     
     my_args = request.args.to_dict()
@@ -335,8 +341,11 @@ def common(lst1, lst2):
             final.append(ob)
     return final
 
-# def common(lst1, lst2):
-#     return list( set(lst1).intersection(set(lst2)) ) 
+#classification ([0, 1, 2] = [communication, process, logistics]), 
+#difficulty ([0, 1, 2, 3]=[Easy, Medium, Hard, Extreme])
+
+class_int = {'communication': 0, 'process': 1, 'logistics': 2}
+diff_int = {'easy': 0, 'medium': 1, 'hard': 2, 'extreme': 3}
 
 # returns boolean for if two users are contacts
 def isContact(self, u_id, f_id):
